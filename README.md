@@ -7,4 +7,8 @@ Implementation is in file [app-fasthtml-000.py](https://github.com/dharmatech/co
 
 The port is not yet complete.
 
+See issues for parts that are yet to be converted.
+
+Feel free to add issues.
+
 ![image](https://github.com/user-attachments/assets/d410901f-ef61-4fa2-ae03-b34f5be74a64)
