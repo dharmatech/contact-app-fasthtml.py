@@ -4,12 +4,15 @@ from fasthtml.common import *
 from fasthtml.components import All_caps, Sub_title
 
 import starlette
+import starlette.responses
 
 # from flask import (
 #     Flask, 
 #     # request, 
 #     flash, jsonify, send_file
 # )
+
+# from flask import send_file
 
 from contacts_model import Contact, Archiver
 
@@ -49,87 +52,36 @@ route_contacts_get.ar.to_app(app)
 import route_contacts_archive_post
 
 route_contacts_archive_post.ar.to_app(app)
+# ---------------------------------------------------------
+import route_contacts_archive_get
+
+route_contacts_archive_get.ar.to_app(app)
 
 # ---------------------------------------------------------
-@app.route("/contacts/archive", methods=['GET'])
-def archive_status():
+import route_contacts_archive_file_get
 
-    archiver = Archiver.get()
-    return template_archive_ui(archiver)
+route_contacts_archive_file_get.ar.to_app(app)
 # ---------------------------------------------------------
-@app.route("/contacts/archive/file", methods=['GET'])
-def archive_content():
-    archiver = Archiver.get()
-    # return send_file(archiver.archive_file(), "archive.json", as_attachment=True)
-    return 'send_file'
+import route_contacts_archive_delete
 
-# @app.route("/contacts/archive/file", methods=["GET"])
-# def archive_content():
-#     archiver = Archiver.get()
-#     return send_file(archiver.archive_file(), "archive.json", as_attachment=True)
+route_contacts_archive_delete.ar.to_app(app)
 # ---------------------------------------------------------
-@app.route("/contacts/archive", methods=['DELETE'])
-def reset_archive():
-    archiver = Archiver.get()
-    archiver.reset()
-    return template_archive_ui(archiver)
+import route_contacts_count_get
+
+route_contacts_count_get.ar.to_app(app)
 # ---------------------------------------------------------
-@app.route("/contacts/count", methods=['GET'])
-def contacts_count():
-    count = Contact.count()
-    return "(" + str(count) + " total Contacts)"
-# ---------------------------------------------------------
-def template_new(contact):
+from template_new import template_new
 
-    def row(label, id, value, errors):
-        return P(
-            Label(label, _for=id),
-            Input(
-                name=id,
-                id=id,
-                type='text',
-                placeholder=label,
-                value=value or ''
-            ),
-            Span(
-                # contact.errors[errors],
-                contact.errors[errors] if (errors in contact.errors) else '',
-                cls='error')
-        )        
+# @app.route("/contacts/new", methods=['GET'])
+# def contacts_new_get():
 
-    return layout(
+#     print('/contacts/new GET')
 
-        Form(
+#     return template_new(contact=Contact())
 
-            Fieldset(
-                Legend('Contact Values'),
+import route_contacts_new_get
 
-                Div(
-                    
-                    row(label='Email',      id='email',      value=contact.email, errors='email'),
-                    row(label='First Name', id='first_name', value=contact.first, errors='first'),
-                    row(label='Last Name',  id='last_name',  value=contact.last,  errors='last'),
-                    row(label='Phone',      id='phone',      value=contact.phone, errors='phone'),
-
-                    cls='table rows'
-                ),
-
-                Button('Save')
-            ),
-
-            action='/contacts/new',
-            method='post'
-        ),
-
-        P(A('Back', href='/contacts'))
-    )
-
-@app.route("/contacts/new", methods=['GET'])
-def contacts_new_get():
-
-    print('/contacts/new GET')
-
-    return template_new(contact=Contact())
+route_contacts_new_get.ar.to_app(app)
 
 # @app.route("/contacts/new", methods=['GET'])
 # def contacts_new_get():
