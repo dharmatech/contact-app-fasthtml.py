@@ -2,6 +2,8 @@
 from fasthtml.common import *
 
 from fasthtml.components import All_caps, Sub_title
+# import starlette.datastructures
+import starlette
 
 # from flask import (
 #     Flask, 
@@ -37,10 +39,8 @@ app, rt = fast_app(
 
 # app.secret_key = b'hypermedia rocks'
 # ---------------------------------------------------------
-# @rt('/')
 @app.route('/')
 def index():
-    # return 'abc'
     return RedirectResponse(url='/contacts')
 
 # @app.route("/")
@@ -58,9 +58,25 @@ def layout(*content):
             ),        
 
         # [Div(message, cls='flash') for message in flask.get_flashed_messages()],
+
+        Script('htmx.config.methodsThatUseUrlParams = ["get"];'),
         
         *content
+
+
     )
+
+
+# @rt
+# def contacts():
+#     pass
+
+# print(to_xml(
+#     A(href=contacts)
+# ))
+
+# contacts.A()
+
 # ---------------------------------------------------------
 def template_archive_ui(archiver):
     return Div(
@@ -204,13 +220,17 @@ def template_index(q, contacts_set):
                                     ),
 
                                     Div(
-                                        A('Edit', role='menuitem', href=f'/contacts/{contact.id}/edit'),
+                                        # A('Edit', role='menuitem', href=f'/contacts/{contact.id}/edit'),
+                                        A('Edit', role='menuitem', href=str(contacts_edit_get).format(contact_id=contact.id)),
                                         A('View', role='menuitem', href=f'/contacts/{contact.id}'),
                                         A('Delete', role='menuitem', href='#',
-                                        hx_delete=f'/contacts/{contact.id}',
-                                        hx_confirm='Are you sure you want to delete this contact?',
-                                        hx_swap='outerHTML swap:1s',
-                                        hx_target='closest tr'),
+                                            # hx_delete=f'/contacts/{contact.id}',
+
+                                            hx_delete=str(contacts_delete).format(contact_id=contact.id),
+
+                                            hx_confirm='Are you sure you want to delete this contact?',
+                                            hx_swap='outerHTML swap:1s',
+                                            hx_target='closest tr'),
 
                                         role='menu',
                                         hidden_id=f'contact-menu-{contact.id}'),
@@ -218,10 +238,6 @@ def template_index(q, contacts_set):
                                     data_overflow_menu=True)))
                     
                         for contact in contacts_set
-                        
-
-                        # Tr(Td('abc')),
-                        # Tr(Td('bcd'))
                     ]
                 )
             ),
@@ -237,7 +253,12 @@ def template_index(q, contacts_set):
         ),
 
         P(
-            A('Add Contact', href='/contacts/new'),
+            # A('Add Contact', href='/contacts/new'),
+
+            A('Add Contact', href=contacts_new_get),
+
+            # contacts_new_get.A('Add Contact')
+
             Span(
 
                 Img(
@@ -253,6 +274,12 @@ def template_index(q, contacts_set):
         )
     
     )
+
+# print(to_xml(
+#     contacts_new_get
+# ))
+
+# type(contacts_new_get)
     
 @app.route("/contacts")
 def contacts(request, q: str = None, page: str = '1'):    
@@ -270,6 +297,7 @@ def contacts(request, q: str = None, page: str = '1'):
     
     return template_index(q, contacts_set)
    
+
     # if search is not None:
     #     contacts_set = Contact.search(search)
     #     if request.headers.get('HX-Trigger') == 'search':
@@ -468,6 +496,12 @@ def contacts_view(contact_id: int = 0):
     contact = Contact.find(contact_id)
     return template_show(contact)
     
+# print(to_xml(str(contacts_view).format(contact_id=123)))
+
+# print(to_xml(str(contacts_view).format(contact_id3=123)))
+
+
+
 # @app.route("/contacts/<contact_id>")
 # def contacts_view(contact_id=0):
 #     contact = Contact.find(contact_id)
@@ -619,6 +653,10 @@ def contacts_delete(request: Request, contact_id: int = 0):
     else:
         return ''
 
+print(to_xml(
+    str(contacts_delete).format(contact_id=123)
+))
+
 # @app.route("/contacts/<contact_id>", methods=["DELETE"])
 # def contacts_delete(contact_id=0):
 #     contact = Contact.find(contact_id)
@@ -630,28 +668,28 @@ def contacts_delete(request: Request, contact_id: int = 0):
 #         return ""
 # ---------------------------------------------------------
 
-@app.route('/contacts/', methods=['DELETE'])
-# def contacts_delete_all(selected_contact_ids):
-# async def contacts_delete_all(selected_contact_ids: str):
+
+
+@app.route('/contacts', methods=['DELETE'])
 async def contacts_delete_all(request: Request):
+        
+    form_data: starlette.datastructures.FormData = await request.form()
 
-    # print(selected_contact_ids)
+    contact_ids = form_data.getlist('selected_contact_ids')
 
-    form_data = await request.form()
+    contact_ids = list(map(int, contact_ids))
 
-    print(form_data)
+    for id in contact_ids:
+        contact = Contact.find(id)
+        contact.delete()
 
-    # selected_contact_ids = request.form.getlist("selected_contact_ids")
+    # flash("Deleted Contacts!")
 
-    # selected_contact_ids = form_data.getlist("selected_contact_ids")
-    
-    # print(selected_contact_ids)
+    print('Deleted Contacts!')
 
-    # contact_ids = list(map(int, selected_contact_ids))
+    contacts_set = Contact.all()
 
-    # print(contact_ids)
-
-    return ''
+    return template_index(None, contacts_set)
 
 # @app.route("/contacts/", methods=["DELETE"])
 # def contacts_delete_all():
