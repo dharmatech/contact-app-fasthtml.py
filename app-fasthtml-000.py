@@ -2,13 +2,11 @@
 from fasthtml.common import *
 
 from fasthtml.components import All_caps, Sub_title
-# import starlette.datastructures
+
 import starlette
 
 # from flask import (
 #     Flask, 
-#     # redirect,
-#     render_template, 
 #     # request, 
 #     flash, jsonify, send_file
 # )
@@ -18,12 +16,6 @@ from contacts_model import Contact, Archiver
 import time
 
 Contact.load_db()
-
-# ========================================================
-# Flask App
-# ========================================================
-
-# app = Flask(__name__)
 
 app, rt = fast_app(
     pico=False,
@@ -37,15 +29,10 @@ app, rt = fast_app(
     )
 )
 
-# app.secret_key = b'hypermedia rocks'
 # ---------------------------------------------------------
 @app.route('/')
 def index():
     return RedirectResponse(url='/contacts')
-
-# @app.route("/")
-# def index():
-#     return redirect("/contacts")
 # ---------------------------------------------------------
 def layout(*content):
 
@@ -62,21 +49,7 @@ def layout(*content):
         Script('htmx.config.methodsThatUseUrlParams = ["get"];'),
         
         *content
-
-
     )
-
-
-# @rt
-# def contacts():
-#     pass
-
-# print(to_xml(
-#     A(href=contacts)
-# ))
-
-# contacts.A()
-
 # ---------------------------------------------------------
 def template_archive_ui(archiver):
     return Div(
@@ -274,13 +247,7 @@ def template_index(q, contacts_set):
         )
     
     )
-
-# print(to_xml(
-#     contacts_new_get
-# ))
-
-# type(contacts_new_get)
-    
+# ---------------------------------------------------------
 @app.route("/contacts")
 def contacts(request, q: str = None, page: str = '1'):    
     
@@ -296,15 +263,6 @@ def contacts(request, q: str = None, page: str = '1'):
         contacts_set = Contact.all()
     
     return template_index(q, contacts_set)
-   
-
-    # if search is not None:
-    #     contacts_set = Contact.search(search)
-    #     if request.headers.get('HX-Trigger') == 'search':
-    #         return render_template("rows.html", contacts=contacts_set)
-    # else:
-    #     contacts_set = Contact.all()
-    # return render_template("index.html", contacts=contacts_set, archiver=Archiver.get())
 # ---------------------------------------------------------
 @app.route("/contacts/archive", methods=['POST'])
 def start_archive():
@@ -312,24 +270,12 @@ def start_archive():
     archiver = Archiver.get()
     archiver.run()
     return template_archive_ui(archiver)
-
-# @app.route("/contacts/archive", methods=["POST"])
-# def start_archive():
-#     archiver = Archiver.get()
-#     archiver.run()
-#     return render_template("archive_ui.html", archiver=archiver)
 # ---------------------------------------------------------
-
 @app.route("/contacts/archive", methods=['GET'])
 def archive_status():
 
     archiver = Archiver.get()
     return template_archive_ui(archiver)
-
-# @app.route("/contacts/archive", methods=["GET"])
-# def archive_status():
-#     archiver = Archiver.get()
-#     return render_template("archive_ui.html", archiver=archiver)
 # ---------------------------------------------------------
 @app.route("/contacts/archive/file", methods=['GET'])
 def archive_content():
@@ -344,27 +290,14 @@ def archive_content():
 # ---------------------------------------------------------
 @app.route("/contacts/archive", methods=['DELETE'])
 def reset_archive():
-
     archiver = Archiver.get()
     archiver.reset()
     return template_archive_ui(archiver)
-
-# @app.route("/contacts/archive", methods=["DELETE"])
-# def reset_archive():
-#     archiver = Archiver.get()
-#     archiver.reset()
-#     return render_template("archive_ui.html", archiver=archiver)
 # ---------------------------------------------------------
-
 @app.route("/contacts/count", methods=['GET'])
 def contacts_count():
     count = Contact.count()
     return "(" + str(count) + " total Contacts)"
-
-# @app.route("/contacts/count")
-# def contacts_count():
-#     count = Contact.count()
-#     return "(" + str(count) + " total Contacts)"
 # ---------------------------------------------------------
 def template_new(contact):
 
@@ -425,26 +358,10 @@ def contacts_new_get():
 @app.route('/contacts/new', methods=['POST'])
 async def contacts_new(request: Request):
 
-    print('/contacts/new POST')
-
-    print(request)
-
-    print(request.form)
-
-    # print(request.form().get('first_name'))
-
-    print('calling request.form()')
-
     form_data = await request.form()
-
-    # print(f"first_name: {form_data.get('first_name')}")
     
     c = Contact(
         id_=None,
-        # first=request.form['first_name'],
-        # last=request.form['last_name'],
-        # phone=request.form['phone'],
-        # email=request.form['email']
 
         first=form_data.get('first_name'),
         last =form_data.get('last_name'),
@@ -452,29 +369,13 @@ async def contacts_new(request: Request):
         email=form_data.get('email')
     )
 
-
     if c.save():
         print('Created New Contact!')
-
         # flash('Created New Contact!')
-
-        # return redirect('/contacts')
-
         return RedirectResponse(url='/contacts')
     else:
         print('calling template_new')
         return template_new(c)
-
-
-# @app.route("/contacts/new", methods=['POST'])
-# def contacts_new():
-#     c = Contact(None, request.form['first_name'], request.form['last_name'], request.form['phone'],
-#                 request.form['email'])
-#     if c.save():
-#         flash("Created New Contact!")
-#         return redirect("/contacts")
-#     else:
-#         return render_template("new.html", contact=c)
 # ---------------------------------------------------------
 def template_show(contact):
     return layout(
@@ -653,9 +554,9 @@ def contacts_delete(request: Request, contact_id: int = 0):
     else:
         return ''
 
-print(to_xml(
-    str(contacts_delete).format(contact_id=123)
-))
+# print(to_xml(
+#     str(contacts_delete).format(contact_id=123)
+# ))
 
 # @app.route("/contacts/<contact_id>", methods=["DELETE"])
 # def contacts_delete(contact_id=0):
