@@ -3,8 +3,6 @@ The book [Hypermedia Systems](https://hypermedia.systems/) contains an example a
 
 This is a port of `contact-app` to [FastHTML](https://www.fastht.ml/).
 
-Implementation is in file [app-fasthtml-000.py](https://github.com/dharmatech/contact-app-fasthtml.py/blob/main/app-fasthtml-000.py).
-
 The port is not yet complete.
 
 See issues for parts that are yet to be converted.
