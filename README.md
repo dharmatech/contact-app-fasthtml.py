@@ -11,4 +11,12 @@ See issues for parts that are yet to be converted.
 
 Feel free to add issues.
 
+# Thanks
+
+Thanks to:
+
+Jeremy Howard and Isaac Flath for their help in the discord channel.
+
+# Screenshot
+
 ![image](https://github.com/user-attachments/assets/d410901f-ef61-4fa2-ae03-b34f5be74a64)
